@@ -1,0 +1,8 @@
+$navigation-drawer-background: rgb(19, 101, 183);
+$navigation-drawer-border-color: "red";
+$navigation-drawer-border-width: 0;
+.v-navigation-drawer {
+  &__content {
+    background-color: rgb(19 101 183);
+  }
+}

@@ -17,6 +17,8 @@ export default defineNuxtConfig({
     },
   },
   css: [
+    "@/assets/main.scss",
+    "vuetify/dist/vuetify.min.css",
     "vuetify/lib/styles/main.sass",
     "@mdi/font/css/materialdesignicons.min.css",
   ],
@@ -35,18 +37,20 @@ export default defineNuxtConfig({
     server: false,
     client: false,
   },
+
   hooks: {
     "vite:extendConfig": (config: any) => {
       // settings css customizations
       config.plugins.push(
         vuetify({
           autoImport: true,
-          styles: { configFile: resolve("./assets/settings.scss") },
+          styles: { configFile: resolve("./assets/main.scss") },
         })
       );
     },
   },
-  modules: ["@nuxt-alt/proxy"],
+  plugins: [],
+  modules: ["@nuxt-alt/proxy", "@pinia/nuxt"],
   proxy: {
     enableProxy: true,
     proxies: {
