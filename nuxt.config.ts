@@ -44,7 +44,6 @@ export default defineNuxtConfig({
       config.plugins.push(
         vuetify({
           autoImport: true,
-          styles: { configFile: resolve("./assets/main.scss") },
         })
       );
     },

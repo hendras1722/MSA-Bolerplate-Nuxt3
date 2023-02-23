@@ -3,7 +3,12 @@
     <client-only>
       <v-app>
         <!-- style="background-color: rgb(19 101 183)" -->
-        <v-navigation-drawer dark :permanent="sm ? false : true" app>
+        <v-navigation-drawer
+          dark
+          :permanent="sm ? false : true"
+          app
+          style="color: white"
+        >
           <v-list>
             <v-list-item
               v-for="(item, i) in state.items"
@@ -56,12 +61,12 @@ const state = reactive({
     {
       icon: "mdi-apps",
       title: "Welcome",
-      to: "/",
+      to: "/admin",
     },
     {
       icon: "mdi-chart-bubble",
       title: "Inspire",
-      to: "/inspire",
+      to: "/admin/inspire",
     },
   ],
   miniVariant: false,

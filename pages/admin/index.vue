@@ -29,6 +29,39 @@ const headers: Array<{
 onMounted(() => {
   storeGetData.getData();
 });
+// unref(computedGetDatas).forEach((x) => console.log(x));
+const state = useState(() => []);
+watch(
+  computedGetDatas,
+  (val, old) => {
+    const rawObject = Object.assign({}, val);
+    state.value = [...state.value, rawObject];
+  },
+  { immediate: true }
+);
+
+// const stateData = useState(() => []);
+
+// function divideArray(array, length) {
+//   const newArray = [...array];
+//   const divideRes = Math.floor(newArray.length / length);
+//   let results = [];
+
+//   for (let i = 0; i < length; i++) {
+//     results.push(newArray.splice(0, divideRes));
+//   }
+
+//   for (let i = 0; i < newArray.length; i++) {
+//     results[i].push(newArray[i]);
+//   }
+
+//   results = results.filter((itm) => itm.length);
+
+//   return results;
+// }
+
+// stateData.value = storeGetData.getData();
+// console.log(stateData.value, "inistatedata");
 </script>
 
 <template>
