@@ -53,6 +53,7 @@
 import { useDisplay } from "vuetify";
 
 const { sm } = useDisplay();
+
 const state = reactive({
   clipped: false,
   drawer: true,

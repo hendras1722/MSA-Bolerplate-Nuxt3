@@ -4,6 +4,14 @@ const { resolve } = createResolver(import.meta.url);
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
+  typescript: {
+    typeCheck: {
+      eslint: {
+        files: "./**/*.{ts,js,vue}",
+      },
+    },
+  },
+  // router: { middleware: ["nuxt-server-init"] },
   app: {
     head: {
       title: "MSA-Boilerplate",
@@ -57,6 +65,11 @@ export default defineNuxtConfig({
         target: "http://jsonplaceholder.typicode.com",
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/fallback/, ""),
+      },
+      "^/dummy/.*": {
+        target: "https://dummyjson.com",
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/dummy/, ""),
       },
     },
     fetch: true,
