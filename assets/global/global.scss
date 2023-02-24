@@ -1,0 +1,8 @@
+.vue3-easy-data-table {
+  &__main {
+    min-height: auto !important;
+  }
+}
+.easy-data-table__rows-selector ul.select-items {
+  z-index: 1 !important;
+}

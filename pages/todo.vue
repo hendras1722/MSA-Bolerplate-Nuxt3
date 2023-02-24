@@ -1,9 +1,13 @@
 <script setup lang="ts">
+import { createSignal } from "../module/state";
+import { Hello } from "../module/hello";
 const stateInput = useState(() => "");
 const stateArray = useState(() => []);
+const [page, setPage] = createSignal(0);
 
 const handleClick = (): void => {
   stateArray.value = [...stateArray.value, stateInput.value];
+  handleAdd(stateArray.value);
   stateInput.value = "";
 };
 
@@ -11,16 +15,37 @@ const handleClose = (value: number): void => {
   let splice = stateArray.value.splice(value, 1);
   stateArray.value = stateArray.value.filter((item) => !splice.includes(item));
 };
+const handleChange = (e) => {
+  setPage(e.target.value);
+};
+
+const formData = reactive({
+  email: "",
+  password: "",
+  confirmPassword: null,
+});
+
+const handleAdd = async (value: Hello): Promise<void> => {
+  const res = await $fetch("/dummy/products/add", {
+    method: "POST",
+    body: JSON.stringify(value),
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  console.log(res, "inires");
+};
 </script>
 
 <template>
   <div>
     <div>Todo Apps</div>
     <v-text-field
-      v-numeric
       v-model="stateInput"
+      v-number
       variant="outlined"
       solo
+      @change="handleChange"
     ></v-text-field>
     <v-btn
       rounded="md"

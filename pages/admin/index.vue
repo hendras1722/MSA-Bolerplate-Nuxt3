@@ -1,8 +1,148 @@
 <script setup lang="ts">
-import { Hello } from "../../module/hello";
-import { DetailAPI } from "../../api/detail";
+// import { Hello } from "../../module/hello";
+// import { DetailAPI } from "../../api/detail";
 import { useGetData } from "../../store/getData";
-import { GetData } from "../../module/GetData";
+// import { GetData } from "../../module/GetData";
+// import {
+//   usePagination,
+//   useRowsPerPage,
+//   UsePaginationReturn,
+//   UseRowsPerPageReturn,
+//   Header,
+//   Item,
+// } from "use-vue3-easy-data-table";
+
+// const dataTable = ref();
+
+// const {
+//   currentPageFirstIndex,
+//   currentPageLastIndex,
+//   clientItemsLength,
+//   maxPaginationNumber,
+//   currentPaginationNumber,
+//   isFirstPage,
+//   isLastPage,
+//   nextPage,
+//   prevPage,
+//   updatePage,
+// }: UsePaginationReturn = usePagination(dataTable);
+
+// const {
+//   rowsPerPageOptions,
+//   rowsPerPageActiveOption,
+//   updateRowsPerPageActiveOption,
+// }: UseRowsPerPageReturn = useRowsPerPage(dataTable);
+
+// const updateRowsPerPageSelect = (e: Event) => {
+//   updateRowsPerPageActiveOption(Number((e.target as HTMLInputElement).value));
+// };
+
+// const headers: Header[] = [
+//   { text: "Name", value: "name" },
+//   { text: "Address", value: "address" },
+//   { text: "Height", value: "height", sortable: true },
+//   { text: "Weight", value: "weight", sortable: true },
+//   { text: "Age", value: "age", sortable: true },
+//   { text: "Favourite sport", value: "favouriteSport" },
+//   { text: "Favourite fruits", value: "favouriteFruits" },
+// ];
+
+const items: Item[] = [
+  {
+    name: "we",
+  },
+  {
+    name: "we",
+  },
+  {
+    name: "we",
+  },
+  {
+    name: "we",
+  },
+  {
+    name: "we",
+  },
+  {
+    name: "we",
+  },
+  {
+    name: "we",
+  },
+  {
+    name: "we",
+  },
+  {
+    name: "we",
+  },
+  {
+    name: "we",
+  },
+];
+
+import type { Header, Item } from "vue3-easy-data-table";
+import { computed, ref } from "vue";
+import { createSignal } from "../../module/state";
+
+const [page, setPage] = createSignal(0);
+
+// $ref dataTable
+const dataTable = ref();
+
+// index related
+const currentPageFirstIndex = computed(
+  () => dataTable.value?.currentPageFirstIndex
+);
+const currentPageLastIndex = computed(
+  () => dataTable.value?.currentPageLastIndex
+);
+const clientItemsLength = computed(() => dataTable.value?.clientItemsLength);
+
+// pagination related
+const maxPaginationNumber = computed(
+  () => dataTable.value?.maxPaginationNumber
+);
+const currentPaginationNumber = computed(
+  () => dataTable.value?.currentPaginationNumber
+);
+
+const isFirstPage = computed(() => dataTable.value?.isFirstPage);
+const isLastPage = computed(() => dataTable.value?.isLastPage);
+
+const nextPage = () => {
+  dataTable.value.nextPage();
+};
+const prevPage = () => {
+  dataTable.value.prevPage();
+};
+const pages = ref(1);
+const updatePage = (paginationNumber: number) => {
+  setPage(pages.value);
+
+  dataTable.value.updatePage(page());
+};
+
+// rows per page related
+const rowsPerPageOptions = computed(() => dataTable.value?.rowsPerPageOptions);
+const rowsPerPageActiveOption = computed(
+  () => dataTable.value?.rowsPerPageActiveOption
+);
+
+const updateRowsPerPageSelect = (e: Event) => {
+  dataTable.value.updateRowsPerPageActiveOption(
+    Number((e.target as HTMLInputElement).value)
+  );
+};
+
+const headers: Header[] = [
+  { text: "Name", value: "name" },
+  { text: "Address", value: "address" },
+  { text: "Height", value: "height", sortable: true },
+  { text: "Weight", value: "weight", sortable: true },
+  { text: "Age", value: "age", sortable: true },
+  { text: "Favourite sport", value: "favouriteSport" },
+  { text: "Favourite fruits", value: "favouriteFruits" },
+];
 
 definePageMeta({
   layout: "admin",
@@ -11,25 +151,9 @@ definePageMeta({
 const storeGetData = useGetData();
 let getDatas = ref([]);
 let computedGetDatas = computed(() => storeGetData.datas);
-const headers: Array<{
-  title: string;
-  align: string;
-  sortable: boolean;
-  key: string;
-}> = [
-  {
-    title: "User Id",
-    align: "start",
-    sortable: false,
-    key: "userId",
-  },
-  { title: "Title", align: "start", key: "title" },
-  { title: "Body", align: "start", key: "body" },
-];
 onMounted(() => {
   storeGetData.getData();
 });
-// unref(computedGetDatas).forEach((x) => console.log(x));
 const state = useState(() => []);
 watch(
   computedGetDatas,
@@ -39,35 +163,65 @@ watch(
   },
   { immediate: true }
 );
-
-// const stateData = useState(() => []);
-
-// function divideArray(array, length) {
-//   const newArray = [...array];
-//   const divideRes = Math.floor(newArray.length / length);
-//   let results = [];
-
-//   for (let i = 0; i < length; i++) {
-//     results.push(newArray.splice(0, divideRes));
-//   }
-
-//   for (let i = 0; i < newArray.length; i++) {
-//     results[i].push(newArray[i]);
-//   }
-
-//   results = results.filter((itm) => itm.length);
-
-//   return results;
-// }
-
-// stateData.value = storeGetData.getData();
-// console.log(stateData.value, "inistatedata");
 </script>
 
 <template>
-  <div>
-    <div>
-      <v-data-table
+  <div class="py-5">
+    <div style="position: relative; z-index: 1">
+      <easytable
+        ref="dataTable"
+        :headers="headers"
+        :items="items"
+        :rows-per-page="3"
+        hide-footer
+      />
+      <div class="customize-footer">
+        <div class="customize-rows-per-page">
+          <select class="select-items" @change="updateRowsPerPageSelect">
+            <option
+              v-for="item in rowsPerPageOptions"
+              :key="item"
+              :selected="item === rowsPerPageActiveOption"
+              :value="item"
+            >
+              {{ item }} rows per page
+            </option>
+          </select>
+        </div>
+
+        <div class="customize-index">
+          Now displaying: {{ currentPageFirstIndex }} ~
+          {{ currentPageLastIndex }} of {{ clientItemsLength }}
+        </div>
+        <v-pagination
+          v-model="pages"
+          :length="maxPaginationNumber"
+          @click="updatePage"
+          :total-visible="2"
+        ></v-pagination>
+
+        {{ maxPaginationNumber }}
+        <div class="customize-buttons">
+          <span
+            v-for="paginationNumber in maxPaginationNumber"
+            class="customize-button"
+            :class="{ active: paginationNumber === currentPaginationNumber }"
+            @click="updatePage(paginationNumber)"
+          >
+            {{ paginationNumber }}
+          </span>
+        </div>
+
+        <div class="customize-pagination">
+          <button class="prev-page" @click="prevPage" :disabled="isFirstPage">
+            prev page
+          </button>
+          <button class="next-page" @click="nextPage" :disabled="isLastPage">
+            next page
+          </button>
+        </div>
+      </div>
+      <!-- <v-data-table
         v-model:items-per-page="computedGetDatas.length"
         :headers="headers"
         :items="computedGetDatas"
@@ -90,7 +244,7 @@ watch(
             <td>{{ item.body }}</td>
           </tr>
         </tbody>
-      </v-table>
+      </v-table> -->
       <!-- {{ computedGetDatas }} -->
     </div>
   </div>
