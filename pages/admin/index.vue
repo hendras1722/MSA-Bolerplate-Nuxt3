@@ -2,7 +2,10 @@
 // import { Hello } from "../../module/hello";
 // import { DetailAPI } from "../../api/detail";
 import { useGetData } from "../../store/getData";
-// import { GetData } from "../../module/GetData";
+import { Header, Item } from "vue3-easy-data-table";
+import { computed, ref } from "vue";
+import { createSignal } from "../../module/state";
+import { GetData } from "../../module/GetData";
 // import {
 //   usePagination,
 //   useRowsPerPage,
@@ -80,10 +83,6 @@ const items: Item[] = [
   },
 ];
 
-import type { Header, Item } from "vue3-easy-data-table";
-import { computed, ref } from "vue";
-import { createSignal } from "../../module/state";
-
 const [page, setPage] = createSignal(0);
 
 // $ref dataTable
@@ -150,16 +149,16 @@ definePageMeta({
 
 const storeGetData = useGetData();
 let getDatas = ref([]);
-let computedGetDatas = computed(() => storeGetData.datas);
+let computedGetDatas = computed(() => storeGetData.datas) as any;
 onMounted(() => {
   storeGetData.getData();
 });
-const state = useState(() => []);
+const state = useState(() => [] as GetData[]);
 watch(
   computedGetDatas,
   (val, old) => {
-    const rawObject = Object.assign({}, val);
-    state.value = [...state.value, rawObject];
+    const value = toRaw(val).slice(0, 20);
+    state.value = value;
   },
   { immediate: true }
 );
@@ -171,16 +170,16 @@ watch(
       <easytable
         ref="dataTable"
         :headers="headers"
-        :items="items"
-        :rows-per-page="3"
+        :items="state"
+        :rows-per-page="10"
         hide-footer
       />
       <div class="customize-footer">
         <div class="customize-rows-per-page">
           <select class="select-items" @change="updateRowsPerPageSelect">
             <option
-              v-for="item in rowsPerPageOptions"
-              :key="item"
+              v-for="(item, i) in rowsPerPageOptions"
+              :key="i"
               :selected="item === rowsPerPageActiveOption"
               :value="item"
             >
