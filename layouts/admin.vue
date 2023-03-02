@@ -39,7 +39,7 @@
 
         <v-main class="posapp">
           <div class="px-6 py-6">
-            <v-card class="px-3 py-3">
+            <v-card class="px-3 py-3 elevation-1">
               <slot />
             </v-card>
           </div>

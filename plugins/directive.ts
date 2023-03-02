@@ -12,7 +12,7 @@ export default defineNuxtPlugin((nuxtApp) => {
     beforeUpdate(el, binding, vnode, prevVnode) {},
     // called after the parent component and
     // all of its children have updated
-    updated(el, binding, vnode, prevVnode): Boolean {
+    updated(el, binding, vnode, prevVnode): void {
       const html = el as HTMLInputElement;
       html.addEventListener("keypress", (evt) => {
         evt = evt || window.event;

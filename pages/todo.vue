@@ -1,68 +1,59 @@
 <script setup lang="ts">
-import { createSignal } from "../module/state";
-import { Hello } from "../module/hello";
-const stateInput = useState(() => "");
-const stateArray = useState(() => []);
-const [page, setPage] = createSignal(0);
+// import
+import { useGetTodo } from "../store/todo";
 
-const handleClick = (): void => {
-  stateArray.value = [...stateArray.value, stateInput.value];
-  handleAdd(stateArray.value);
-  stateInput.value = "";
+// state menagement
+const { datas, addData } = useGetTodo();
+const state = reactive({
+  title: "",
+  description: "",
+});
+
+// function
+const handleClick = async (): Promise<void> => {
+  const stateRaw = JSON.parse(JSON.stringify(state));
+  datas.push(stateRaw);
+  const res = await addData(datas);
+  if (res) {
+    FunctionResetState(state);
+  }
 };
 
 const handleClose = (value: number): void => {
-  let splice = stateArray.value.splice(value, 1);
-  stateArray.value = stateArray.value.filter((item) => !splice.includes(item));
-};
-const handleChange = (e) => {
-  setPage(e.target.value);
-};
-
-const formData = reactive({
-  email: "",
-  password: "",
-  confirmPassword: null,
-});
-
-const handleAdd = async (value: Hello): Promise<void> => {
-  const res = await $fetch("/dummy/products/add", {
-    method: "POST",
-    body: JSON.stringify(value),
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-  console.log(res, "inires");
+  datas.splice(value, 1);
 };
 </script>
 
 <template>
   <div>
     <div>Todo Apps</div>
+    <v-text-field v-model="state.title" variant="outlined" solo></v-text-field>
     <v-text-field
-      v-model="stateInput"
+      v-model="state.description"
       v-number
       variant="outlined"
       solo
-      @change="handleChange"
     ></v-text-field>
+    <!-- @change="handleChange" -->
     <v-btn
       rounded="md"
       color="#5eb233"
       elavation="1"
       class="white--text"
       variant="flat"
-      @click="handleClick()"
+      @click="handleClick"
     >
       Add
     </v-btn>
 
     <div class="mt-5">
-      <v-card class="mx-auto mt-3" v-for="(item, i) in stateArray" :key="i">
+      <v-card class="mx-auto mt-3" v-for="(item, i) in datas" :key="i">
         <v-card-text class="d-flex align-center justify-space-between">
           <div>
-            {{ item }}
+            {{ item.title }}
+          </div>
+          <div>
+            {{ item.description }}
           </div>
           <div>
             <v-btn
@@ -72,6 +63,7 @@ const handleAdd = async (value: Hello): Promise<void> => {
               variant="flat"
               @click="handleClose(i)"
             >
+              <!-- -->
               Delete
             </v-btn>
           </div>

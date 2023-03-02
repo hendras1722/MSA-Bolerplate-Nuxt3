@@ -1,91 +1,11 @@
 <script setup lang="ts">
-// import { Hello } from "../../module/hello";
-// import { DetailAPI } from "../../api/detail";
 import { useGetData } from "../../store/getData";
-import { Header, Item } from "vue3-easy-data-table";
 import { computed, ref } from "vue";
-import { createSignal } from "../../module/state";
-import { GetData } from "../../module/GetData";
-// import {
-//   usePagination,
-//   useRowsPerPage,
-//   UsePaginationReturn,
-//   UseRowsPerPageReturn,
-//   Header,
-//   Item,
-// } from "use-vue3-easy-data-table";
+import type { Header, Item } from "vue3-easy-data-table";
 
-// const dataTable = ref();
-
-// const {
-//   currentPageFirstIndex,
-//   currentPageLastIndex,
-//   clientItemsLength,
-//   maxPaginationNumber,
-//   currentPaginationNumber,
-//   isFirstPage,
-//   isLastPage,
-//   nextPage,
-//   prevPage,
-//   updatePage,
-// }: UsePaginationReturn = usePagination(dataTable);
-
-// const {
-//   rowsPerPageOptions,
-//   rowsPerPageActiveOption,
-//   updateRowsPerPageActiveOption,
-// }: UseRowsPerPageReturn = useRowsPerPage(dataTable);
-
-// const updateRowsPerPageSelect = (e: Event) => {
-//   updateRowsPerPageActiveOption(Number((e.target as HTMLInputElement).value));
-// };
-
-// const headers: Header[] = [
-//   { text: "Name", value: "name" },
-//   { text: "Address", value: "address" },
-//   { text: "Height", value: "height", sortable: true },
-//   { text: "Weight", value: "weight", sortable: true },
-//   { text: "Age", value: "age", sortable: true },
-//   { text: "Favourite sport", value: "favouriteSport" },
-//   { text: "Favourite fruits", value: "favouriteFruits" },
-// ];
-
-const items: Item[] = [
-  {
-    name: "we",
-  },
-  {
-    name: "we",
-  },
-  {
-    name: "we",
-  },
-  {
-    name: "we",
-  },
-  {
-    name: "we",
-  },
-  {
-    name: "we",
-  },
-  {
-    name: "we",
-  },
-  {
-    name: "we",
-  },
-  {
-    name: "we",
-  },
-  {
-    name: "we",
-  },
-];
-
-const [page, setPage] = createSignal(0);
-
-// $ref dataTable
+// reff
+let page = ref<number>(1);
+const pageSelect = ref(10);
 const dataTable = ref();
 
 // index related
@@ -105,27 +25,37 @@ const currentPaginationNumber = computed(
   () => dataTable.value?.currentPaginationNumber
 );
 
-const isFirstPage = computed(() => dataTable.value?.isFirstPage);
-const isLastPage = computed(() => dataTable.value?.isLastPage);
+// const isFirstPage = computed(() => dataTable.value?.isFirstPage);
+// const isLastPage = computed(() => dataTable.value?.isLastPage);
 
-const nextPage = () => {
-  dataTable.value.nextPage();
-};
-const prevPage = () => {
-  dataTable.value.prevPage();
-};
-const pages = ref(1);
-const updatePage = (paginationNumber: number) => {
-  setPage(pages.value);
+// const nextPage = () => {
+//   dataTable.value.nextPage();
+// };
+// const prevPage = () => {
+//   dataTable.value.prevPage();
+// };
 
-  dataTable.value.updatePage(page());
+const updatePagePagination = () => {
+  dataTable.value.updatePage(page.value);
 };
+// const updatePage = (paginationNumber: number) => {
+//   console.log(paginationNumber, page.value);
+//   dataTable.value.updatePage(paginationNumber);
+// };
 
 // rows per page related
 const rowsPerPageOptions = computed(() => dataTable.value?.rowsPerPageOptions);
 const rowsPerPageActiveOption = computed(
   () => dataTable.value?.rowsPerPageActiveOption
 );
+
+const handleChange = (e: number) => {
+  dataTable.value.updateRowsPerPageActiveOption(e);
+
+  if (maxPaginationNumber.value <= page.value) {
+    page.value = maxPaginationNumber.value;
+  }
+};
 
 const updateRowsPerPageSelect = (e: Event) => {
   dataTable.value.updateRowsPerPageActiveOption(
@@ -134,13 +64,8 @@ const updateRowsPerPageSelect = (e: Event) => {
 };
 
 const headers: Header[] = [
-  { text: "Name", value: "name" },
-  { text: "Address", value: "address" },
-  { text: "Height", value: "height", sortable: true },
-  { text: "Weight", value: "weight", sortable: true },
-  { text: "Age", value: "age", sortable: true },
-  { text: "Favourite sport", value: "favouriteSport" },
-  { text: "Favourite fruits", value: "favouriteFruits" },
+  { text: "Title", value: "title" },
+  { text: "Description", value: "body" },
 ];
 
 definePageMeta({
@@ -148,20 +73,23 @@ definePageMeta({
 });
 
 const storeGetData = useGetData();
-let getDatas = ref([]);
-let computedGetDatas = computed(() => storeGetData.datas) as any;
+let computedGetDatas = computed(() => storeGetData.dataGetData);
 onMounted(() => {
-  storeGetData.getData();
+  storeGetData.getDatas();
 });
-const state = useState(() => [] as GetData[]);
+const state = useState<Item[]>(() => []);
 watch(
   computedGetDatas,
   (val, old) => {
-    const value = toRaw(val).slice(0, 20);
+    const value = toRaw(val);
     state.value = value;
   },
   { immediate: true }
 );
+
+watch(pageSelect, (val, old) => {
+  handleChange(val);
+});
 </script>
 
 <template>
@@ -173,78 +101,34 @@ watch(
         :items="state"
         :rows-per-page="10"
         hide-footer
+        table-class-name="customize-table"
       />
       <div class="customize-footer">
-        <div class="customize-rows-per-page">
-          <select class="select-items" @change="updateRowsPerPageSelect">
-            <option
-              v-for="(item, i) in rowsPerPageOptions"
-              :key="i"
-              :selected="item === rowsPerPageActiveOption"
-              :value="item"
-            >
-              {{ item }} rows per page
-            </option>
-          </select>
-        </div>
+        <div class="d-flex justify-space-between mt-5">
+          <v-select
+            v-model="pageSelect"
+            :items="rowsPerPageOptions"
+            variant="solo"
+            class="select"
+            :dense="true"
+          ></v-select>
 
-        <div class="customize-index">
-          Now displaying: {{ currentPageFirstIndex }} ~
-          {{ currentPageLastIndex }} of {{ clientItemsLength }}
-        </div>
-        <v-pagination
-          v-model="pages"
-          :length="maxPaginationNumber"
-          @click="updatePage"
-          :total-visible="2"
-        ></v-pagination>
-
-        {{ maxPaginationNumber }}
-        <div class="customize-buttons">
-          <span
-            v-for="paginationNumber in maxPaginationNumber"
-            class="customize-button"
-            :class="{ active: paginationNumber === currentPaginationNumber }"
-            @click="updatePage(paginationNumber)"
-          >
-            {{ paginationNumber }}
-          </span>
-        </div>
-
-        <div class="customize-pagination">
-          <button class="prev-page" @click="prevPage" :disabled="isFirstPage">
-            prev page
-          </button>
-          <button class="next-page" @click="nextPage" :disabled="isLastPage">
-            next page
-          </button>
+          <v-pagination
+            v-model="page"
+            :length="maxPaginationNumber"
+            @click="updatePagePagination"
+            :total-visible="5"
+            class="page-table"
+          ></v-pagination>
         </div>
       </div>
-      <!-- <v-data-table
-        v-model:items-per-page="computedGetDatas.length"
-        :headers="headers"
-        :items="computedGetDatas"
-        item-value="name"
-        class="elevation-1"
-      ></v-data-table>
-
-      <v-table>
-        <thead>
-          <tr>
-            <th class="text-left">User ID</th>
-            <th class="text-left">Title</th>
-            <th class="text-left">Body</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="item in computedGetDatas" :key="item.name">
-            <td>{{ item.userId }}</td>
-            <td>{{ item.title }}</td>
-            <td>{{ item.body }}</td>
-          </tr>
-        </tbody>
-      </v-table> -->
-      <!-- {{ computedGetDatas }} -->
     </div>
   </div>
 </template>
+
+<style lang="scss" scoped>
+.select {
+  max-width: 100px !important;
+  max-height: 30px !important;
+}
+</style>
